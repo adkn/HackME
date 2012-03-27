@@ -41,7 +41,7 @@ class Terminal(Tkinter.Label):
 	def keyPressed(self, event):
 		if self.state == const.states.boot or self.state == const.states.init:
 			return
-		if event.keysym == "Return":
+		if event.keysym == "Return" or event.keysym == "KP_Enter":
 			print "enter geldi"
 			command = self.getLastLine()
 			print command
@@ -66,8 +66,9 @@ class Terminal(Tkinter.Label):
 		else:
 			if len(event.char) == 1:
 				self.printOut(event.char)
+		
 		for key in event.__dict__:
-					print key, ':', event.__dict__[key]
+			print key, ':', event.__dict__[key]
 
 	def updateText(self):
 		self.config(text=self.text + '_')
