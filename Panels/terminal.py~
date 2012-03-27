@@ -1,22 +1,24 @@
 import Tkinter
 import threading
 import const
+import tkFont
 
 class Terminal(Tkinter.Label):
 	def __init__(self, mWindow, width, height, bgcolor, shutTime=2.0):
 		Tkinter.Label.__init__(self, master=mWindow, foreground="green", background=bgcolor, anchor=Tkinter.SW, justify=Tkinter.LEFT)
 
-		ch = 13
-		cw = 7
-		self.th = height/ch
-		self.lw = width/cw
-
 		self.height, self.width = height, width
 		self.shutTime = shutTime
 		self.userName = ""
 		self.passWord = ""
+		
+		self.font = tkFont.Font(family="Monospace", size=10, weight="normal")
+		cw = self.font.measure('A')
+		ch = self.font.metrics("linespace")
+		self.th = height/ch
+		self.lw = width/cw - 2
 
-		self.config(font=("courier",  8, "normal"), width=self.lw, height=self.th, relief=Tkinter.SUNKEN)
+		self.config(font=self.font, width=self.lw, height=self.th, relief=Tkinter.SUNKEN)
 
 		self.text = ""
 		self.lineL = 0
@@ -64,7 +66,7 @@ class Terminal(Tkinter.Label):
 		elif event.keysym == "Down": #down arrow
 			self.getNextCommand()
 		else:
-			if event.char in self.avaibKeys:
+			if len(event.char) == 1:
 				self.printOut(event.char)
 		
 		for key in event.__dict__:
@@ -200,7 +202,7 @@ class Terminal(Tkinter.Label):
 					self.printOut('\n')
 					for poss in possibilities:
 						self.printOut(poss + '\n')
-					self.printOut(line)
+					self.printOut(":>" + line)
 
 	def getPrevCommand(self):
 		if self.last >= 0:
@@ -233,12 +235,15 @@ class Terminal(Tkinter.Label):
 				self.lineL += 1
 				self.text += c
 			
-			if self.lineL >= self.lw:
-				command = self.getLastLine()
+			if self.lineL >= self.lw - 1:
+				command = self.getLastLine(clean=False)
 				self.text += '\n'
 				self.lineL = 0
 				self.lineC += 1
-				self.printOut(": command not found\n:>")
+				if command.startswith(":>"):
+					self.printOut(": command not found\n:>")
+				elif self.state == const.states.login:
+					self.doCommand(command)
 
 			if self.lineC >= self.th:
 				self.lineC -= 1
@@ -278,8 +283,8 @@ class Terminal(Tkinter.Label):
 
 		height = self.height*3
 		width = self.width*2
-		ch = 13
-		cw = 7
+		cw = self.font.measure('A')
+		ch = self.font.metrics("linespace")
 		self.th = height/ch
 		self.lw = width/cw
 		self.config(foreground="white", height=self.th, width=self.lw)
@@ -310,8 +315,8 @@ class Terminal(Tkinter.Label):
 
 		height = self.height*3
 		width = self.width*2
-		ch = 13
-		cw = 7
+		cw = self.font.measure('A')
+		ch = self.font.metrics("linespace")
 		self.th = height/ch
 		self.lw = width/cw
 		self.config(foreground="white", height=self.th, width=self.lw)

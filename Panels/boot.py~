@@ -1,6 +1,5 @@
 import Tkinter
 import threading
-import tkFont
 
 class Boot(Tkinter.Label):
 	def __init__(self, mWindow, width, height, bgcolor, bootTime=5, shutTime=2):

@@ -18,8 +18,8 @@ class HackMEWindow(Tkinter.Tk):
 		self.bind_all("<<alias>>", self.eventHandler)
 		self.config(bg=bgcolor)
 		
-		self.width, self.height = width, height
-		#self.width, self.height = self.winfo_screenwidth(), self.winfo_screenheight()
+		#self.width, self.height = width, height
+		self.width, self.height = self.winfo_screenwidth(), self.winfo_screenheight()
 
 		self.bgcolor = bgcolor
 		self.initView()
@@ -27,12 +27,13 @@ class HackMEWindow(Tkinter.Tk):
 	def initView(self):
 		bgcolor = self.bgcolor
 		width, height = self.width, self.height
-		#self.overrideredirect(True)
+		if os.name == "nt":
+			self.overrideredirect(True)
 		self.geometry(str(self.width)+"x"+str(self.height)+"+0+0")
 		self.focus_set()
 
-		bootTime = 0.0
-		shutTime = 0.0
+		bootTime = 4.0
+		shutTime = 2.0
 
 		self.boot = boot.Boot(self, width, height, bgcolor, bootTime=bootTime)
 		self.boot.pack(fill=Tkinter.BOTH, expand=True)
@@ -81,6 +82,10 @@ class HackMEWindow(Tkinter.Tk):
 				for i in range(3):
 					self.explorers[i].destroy()
 				self.explorerFrame.destroy()
+				
+				self.terminal1.config(highlightthickness=0, bd=0)
+				self.terminal2.config(highlightthickness=0, bd=0)
+				self.terminalFrame.config(highlightthickness=0, bd=0)
 			elif self.terminal1.state == const.states.restart2:
 				self.terminal2.destroy()
 				self.terminal1.destroy()
