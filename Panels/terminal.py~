@@ -41,7 +41,7 @@ class Terminal(Tkinter.Label):
 	def keyPressed(self, event):
 		if self.state == const.states.boot or self.state == const.states.init:
 			return
-		if event.keysym == "Return":
+		if event.keycode == "Return":
 			print "enter geldi"
 			command = self.getLastLine()
 			print command
