@@ -7,14 +7,14 @@ class HackMEWindow(Tkinter.Tk):
 	def __init__(self, width=800, height=600, bgcolor="black"):
 		Tkinter.Tk.__init__(self)
 		self.title("HackME")
-		try:
-			self.iconbitmap("./hackme.ico")
-		except:
+		if os.name == "posix":
 			self.iconbitmap(bitmap="@./hackme.xbm")
+		elif os.name == "nt":
+			self.iconbitmap("./hackme.ico")
 		self.bind_all("<Key>", self.eventHandler)
 		self.bind_all("<Button>", self.eventHandler)
 		self.bind_all("<<boot>>", self.eventHandler)
-		self.bind_all("<<shut>>", self.eventHandler)
+		self.bind_all("<<shut>>", self.shutDownHandler)
 		self.bind_all("<<alias>>", self.eventHandler)
 		self.config(bg=bgcolor)
 		
@@ -28,15 +28,17 @@ class HackMEWindow(Tkinter.Tk):
 		bgcolor = self.bgcolor
 		width, height = self.width, self.height
 		if os.name == "nt":
-			self.overrideredirect(True)
-		self.geometry(str(self.width)+"x"+str(self.height)+"+0+0")
+			self.wm_attributes("-fullscreen", 1)
+		#self.geometry(str(self.width)+"x"+str(self.height)+"+0+0")
 		self.focus_set()
 
-		bootTime = 4.0
-		shutTime = 2.0
+		bootTime = 3.0
+		shutTime = 1.0
 
 		self.boot = boot.Boot(self, width, height, bgcolor, bootTime=bootTime)
 		self.boot.pack(fill=Tkinter.BOTH, expand=True)
+
+		self.shut = shutdown.Shutdown(self, width, height, bgcolor, shutTime=bootTime)
 		
 		self.explorerFrame = Tkinter.Frame(self, width=width, height=height/3*2)
 		self.explorerFrame.pack(fill=Tkinter.BOTH, side=Tkinter.TOP, expand=True)
@@ -58,6 +60,33 @@ class HackMEWindow(Tkinter.Tk):
 		self.terminal2 = terminal.Terminal(self.terminalFrame, width/2, height/3, bgcolor)
 		self.terminal2.pack(fill=Tkinter.BOTH, side=Tkinter.LEFT, expand=True)
 
+	def shutDownHandler(self, event=None):
+		if self.shut.state == const.states.hack:
+			for i in range(3):
+				self.explorers[i].destroy()
+			self.explorerFrame.destroy()
+			self.terminal2.destroy()
+			self.terminalFrame.destroy()
+
+			self.shut.pack(fill=Tkinter.BOTH, expand=True)
+			if self.terminal1.state == const.states.restart:
+				threading.Thread(target=self.shut.shutDown, args=(True,)).start()
+			else:
+				threading.Thread(target=self.shut.shutDown).start()
+		elif self.shut.state == const.states.shutdown:
+			del self.terminal1
+			del self.terminal2
+			del self.terminalFrame
+			for i in range(3):
+				del self.explorers[0]
+			del self.explorerFrame
+
+			self.destroy()
+			self.quit()
+		elif self.shut.state == const.states.restart:
+			self.shut.destroy()
+			self.initView()		
+
 	def eventHandler(self, event=None):
 		if event.type == "2":
 			self.terminal1.keyPressed(event)
@@ -67,31 +96,6 @@ class HackMEWindow(Tkinter.Tk):
 				self.boot.destroy()
 				self.terminal1.printOut("Login: ")
 				self.terminal1.state = const.states.login
-			elif self.terminal1.state == const.states.shutdown1:
-				for i in range(3):
-					self.explorers[i].destroy()
-				self.explorerFrame.destroy()
-			elif self.terminal1.state == const.states.shutdown2:
-				self.terminal2.destroy()
-				self.terminal1.destroy()
-				self.terminalFrame.destroy()
-				self.destroy()
-
-				self.quit()
-			elif self.terminal1.state == const.states.restart1:
-				for i in range(3):
-					self.explorers[i].destroy()
-				self.explorerFrame.destroy()
-				
-				self.terminal1.config(highlightthickness=0, bd=0)
-				self.terminal2.config(highlightthickness=0, bd=0)
-				self.terminalFrame.config(highlightthickness=0, bd=0)
-			elif self.terminal1.state == const.states.restart2:
-				self.terminal2.destroy()
-				self.terminal1.destroy()
-				self.terminalFrame.destroy()
-
-				self.initView()
 			elif self.terminal1.state == const.states.hack:
 				self.explorers[2].updAlias(self.terminal1.aliases)
 		
@@ -104,4 +108,5 @@ def main():
 	mWindow.mainloop()
 
 if __name__ == "__main__":
-	main()
+	if os.name == "nt" or os.name == "posix":
+		main()

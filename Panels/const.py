@@ -3,7 +3,5 @@ class states:
 	login = 1
 	init  = 2
 	hack  = 3
-	shutdown1 = 4
-	shutdown2 = 5
-	restart1 = 6
-	restart2 = 7
+	shutdown = 4
+	restart = 5

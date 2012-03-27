@@ -2,6 +2,7 @@ import Tkinter
 import threading
 import const
 import tkFont
+import os
 
 class Terminal(Tkinter.Label):
 	def __init__(self, mWindow, width, height, bgcolor, shutTime=2.0):
@@ -12,7 +13,10 @@ class Terminal(Tkinter.Label):
 		self.userName = ""
 		self.passWord = ""
 		
-		self.font = tkFont.Font(family="Monospace", size=10, weight="normal")
+		if os.name == "posix":
+			self.font = tkFont.Font(family="Monospace", size=10, weight="normal")
+		elif os.name == "nt":
+			self.font = tkFont.Font(family="courier", size=8, weight="normal")
 		cw = self.font.measure('A')
 		ch = self.font.metrics("linespace")
 		self.th = height/ch
@@ -44,11 +48,11 @@ class Terminal(Tkinter.Label):
 		if self.state == const.states.boot or self.state == const.states.init:
 			return
 		if event.keysym == "Return" or event.keysym == "KP_Enter":
-			print "enter geldi"
 			command = self.getLastLine()
-			print command
 			self.printOut('\n')
 			self.doCommand(command)
+			if not self.winfo_exists():
+				return
 			if self.state == const.states.hack:
 				self.printOut(":>")
 		elif event.keysym == "BackSpace":
@@ -68,7 +72,7 @@ class Terminal(Tkinter.Label):
 		else:
 			if len(event.char) == 1:
 				self.printOut(event.char)
-		
+
 		#for key in event.__dict__:
 		#	print key, ':', event.__dict__[key]
 
@@ -147,10 +151,13 @@ class Terminal(Tkinter.Label):
 		self.printOut(variable + " set to " + value + '\n')
 
 	def c_shutdown(self):
-		threading.Thread(target=self.shutDown).start()
+		self.event_generate("<<shut>>")
+		self.destroy()
 
 	def c_restart(self):
-		threading.Thread(target=self.reStart).start()
+		self.state = const.states.restart
+		self.event_generate("<<shut>>")
+		self.destroy()
 
 	def c_help(self):
 		for comEntry in self.commands:
@@ -270,70 +277,6 @@ class Terminal(Tkinter.Label):
 		self.state = const.states.hack
 
 		self.printOut(":>")
-
-	def shutDown(self):
-		f = open('./Content/shutdown.txt')
-		shutText = f.read()
-		f.close()
-
-		self.text = ""
-		self.updateText()
-		self.state = const.states.shutdown1
-		self.event_generate("<<shut>>")
-
-		height = self.height*3
-		width = self.width*2
-		cw = self.font.measure('A')
-		ch = self.font.metrics("linespace")
-		self.th = height/ch
-		self.lw = width/cw
-		self.config(foreground="white", height=self.th, width=self.lw)
-
-		shutTime = self.shutTime #secs
-		timepl = shutTime/len(shutText.split('\n'))
-
-		for c in shutText.split('\n'):
-			if len(c) > 1:
-				if not c.endswith('.'):
-					self.printOut(c + '\n')
-				else:
-					self.printOut(c)
-			threading._sleep(timepl)
-
-		self.state = const.states.shutdown2
-		self.event_generate("<<shut>>")
-	
-	def reStart(self):
-		f = open('./Content/shutdown.txt')
-		shutText = f.read()
-		f.close()
-
-		self.text = ""
-		self.updateText()
-		self.state = const.states.restart1
-		self.event_generate("<<shut>>")
-
-		height = self.height*3
-		width = self.width*2
-		cw = self.font.measure('A')
-		ch = self.font.metrics("linespace")
-		self.th = height/ch
-		self.lw = width/cw
-		self.config(foreground="white", height=self.th, width=self.lw)
-
-		shutTime = self.shutTime #secs
-		timepl = shutTime/len(shutText.split('\n'))
-
-		for c in shutText.split('\n'):
-			if len(c) > 1:
-				if not c.endswith('.'):
-					self.printOut(c + '\n')
-				else:
-					self.printOut(c)
-			threading._sleep(timepl)
-
-		self.state = const.states.restart2
-		self.event_generate("<<shut>>")
 		
 	def login(self, userName, passWord):
 		self.state = const.states.init

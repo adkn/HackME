@@ -1,5 +1,6 @@
 import Tkinter
 import tkFont
+import os
 
 class Explorer(Tkinter.Canvas):
 	def __init__(self, mWindow, name, width, height, bgcolor):
@@ -11,7 +12,10 @@ class Explorer(Tkinter.Canvas):
 
 		self.config(highlightcolor="white")
 		
-		self.font = tkFont.Font(family="Monospace", size=10, weight="normal")
+		if os.name == "posix":
+			self.font = tkFont.Font(family="Monospace", size=10, weight="normal")
+		elif os.name == "nt":
+			self.font = tkFont.Font(family="courier", size=8, weight="normal")
 		cw = self.font.measure('A')
 		ch = self.font.metrics("linespace")
 

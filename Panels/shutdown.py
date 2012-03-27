@@ -2,9 +2,10 @@ import Tkinter
 import threading
 import tkFont
 import os
+import const
 
-class Boot(Tkinter.Label):
-	def __init__(self, mWindow, width, height, bgcolor, bootTime=5):
+class Shutdown(Tkinter.Label):
+	def __init__(self, mWindow, width, height, bgcolor, shutTime=2):
 		Tkinter.Label.__init__(self, foreground="white", background=bgcolor, anchor=Tkinter.SW, justify=Tkinter.LEFT)
 
 		if os.name == "posix":
@@ -17,16 +18,15 @@ class Boot(Tkinter.Label):
 		self.lw = width/cw - 2
 
 		self.height, self.width = height, width
+		self.state = const.states.hack
 
-		self.bootTime = bootTime
+		self.shutTime = shutTime
 
 		self.config(font=self.font, width=self.lw, height=self.th)
 
 		self.text = ""
 		self.lineL = 0
 		self.lineC = 0
-
-		threading.Thread(target=self.boot).start()
 
 	def updateText(self):
 		self.config(text=self.text)
@@ -59,15 +59,26 @@ class Boot(Tkinter.Label):
 
 		self.updateText()
 	
-	def boot(self):
-		f = open('./Content/boot.txt')
-		bootText = f.read()
+	def shutDown(self, restart=False):
+		f = open('./Content/shutdown.txt')
+		shutText = f.read()
 		f.close()
 
-		bootTime = self.bootTime #secs
-		timepl = bootTime/len(bootText.split('\n'))
+		self.text = ""
+		self.updateText()
 
-		for c in bootText.split('\n'):
+		height = self.height*3
+		width = self.width*2
+		cw = self.font.measure('A')
+		ch = self.font.metrics("linespace")
+		self.th = height/ch
+		self.lw = width/cw
+		self.config(foreground="white", height=self.th, width=self.lw)
+
+		shutTime = self.shutTime #secs
+		timepl = shutTime/len(shutText.split('\n'))
+
+		for c in shutText.split('\n'):
 			if len(c) > 1:
 				if not c.endswith('.'):
 					self.printOut(c + '\n')
@@ -75,9 +86,8 @@ class Boot(Tkinter.Label):
 					self.printOut(c)
 			threading._sleep(timepl)
 
-		height = self.height/3
-		ch = 13
-		self.th = height/ch
-		self.text=""
-		self.updateText()
-		self.event_generate("<<boot>>")
+		if restart:
+			self.state = const.states.restart
+		else:
+			self.state = const.states.shutdown
+		self.event_generate("<<shut>>")
