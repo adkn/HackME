@@ -28,7 +28,7 @@ class Explorer(Tkinter.Canvas):
 		self.aliasBox = Tkinter.Listbox(self, background=self.bgcolor, foreground="green", width=self.width/8, height=self.height/13 - 9)
 		self.aliasBox.config(bd=0, relief=Tkinter.FLAT, font=("courier",  8, "normal"), yscrollcommand=(self.aliasBar, 'set'))
 		self.aliasBox.config(selectforeground="green", selectbackground=self.bgcolor, activestyle="none", highlightthickness=0)
-		self.aliasBox.pack(pady=8, padx=2, side=Tkinter.RIGHT, fill=Tkinter.X, expand=True, anchor=Tkinter.NW)
+		self.aliasBox.pack(pady=8, padx=2, side=Tkinter.RIGHT, fill=Tkinter.X, expand=True, ancho)
 
 		self.aliasBar.config(command=(self.aliasBox, 'yview'))
 
