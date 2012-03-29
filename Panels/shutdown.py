@@ -5,7 +5,7 @@ import os
 import const
 
 class Shutdown(Tkinter.Label):
-	def __init__(self, mWindow, width, height, bgcolor, shutTime=2):
+	def __init__(self, mWindow, width, height, bgcolor, lang, shutTime=2):
 		Tkinter.Label.__init__(self, foreground="white", background=bgcolor, anchor=Tkinter.SW, justify=Tkinter.LEFT)
 
 		if os.name == "posix":
@@ -16,6 +16,8 @@ class Shutdown(Tkinter.Label):
 		ch = self.font.metrics("linespace")
 		self.th = height/ch
 		self.lw = width/cw - 2
+
+		self.lang = lang
 
 		self.height, self.width = height, width
 		self.state = const.states.hack
@@ -60,7 +62,7 @@ class Shutdown(Tkinter.Label):
 		self.updateText()
 	
 	def shutDown(self, restart=False):
-		f = open('./Content/shutdown.txt')
+		f = open(self.lang["shutdown"])
 		shutText = f.read()
 		f.close()
 

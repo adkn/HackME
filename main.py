@@ -17,12 +17,33 @@ class HackMEWindow(Tkinter.Tk):
 		self.bind_all("<<shut>>", self.shutDownHandler)
 		self.bind_all("<<alias>>", self.eventHandler)
 		self.config(bg=bgcolor)
+
+		lang = "EN"
+		self.loadLang(lang)
 		
 		#self.width, self.height = width, height
 		self.width, self.height = self.winfo_screenwidth(), self.winfo_screenheight()
 
 		self.bgcolor = bgcolor
 		self.initView()
+
+	def loadLang(self, lang):
+		langs = []
+		for dirpath, dirnames, filenames in os.walk("./Content/"):
+			for dir in dirnames:
+				langs.append(dir)
+		langDir = "./Content/"
+		if lang in langs:
+			langDir = "./Content/" + lang
+		langFile = langDir + "/templates.txt"
+		f = open(langFile)
+		langParams = f.read()
+		f.close()
+
+		exec("self.lang = " + langParams)
+		self.lang["boot"] = langDir + "/boot.txt"
+		self.lang["shutdown"] = langDir + "/shutDown.txt"
+		self.lang["initialize"] = langDir + "/initialize.txt"
 	
 	def initView(self):
 		bgcolor = self.bgcolor
@@ -35,29 +56,29 @@ class HackMEWindow(Tkinter.Tk):
 		bootTime = 3.0
 		shutTime = 1.0
 
-		self.boot = boot.Boot(self, width, height, bgcolor, bootTime=bootTime)
+		self.boot = boot.Boot(self, width, height, bgcolor, self.lang, bootTime=bootTime)
 		self.boot.pack(fill=Tkinter.BOTH, expand=True)
 
-		self.shut = shutdown.Shutdown(self, width, height, bgcolor, shutTime=bootTime)
+		self.shut = shutdown.Shutdown(self, width, height, bgcolor, self.lang, shutTime=shutTime)
 		
 		self.explorerFrame = Tkinter.Frame(self, width=width, height=height/3*2)
 		self.explorerFrame.pack(fill=Tkinter.BOTH, side=Tkinter.TOP, expand=True)
 
-		explorerNames = ["File Explorer", "Text Editor", "Aliases"]
+		explorerNames = ["fileexplorer", "texteditor", "aliases"]
 		self.explorers = []
 
 		for i in range(3):
-			self.explorers.append(explorer.Explorer(self.explorerFrame, explorerNames[i], width/3, height/3*2, bgcolor))
+			self.explorers.append(explorer.Explorer(self.explorerFrame, explorerNames[i], width/3, height/3*2, bgcolor, self.lang))
 			self.explorers[i].pack(fill=Tkinter.BOTH, side=Tkinter.LEFT, expand=True)
 		
 		self.terminalFrame = Tkinter.Frame(self)
 		self.terminalFrame.pack(side=Tkinter.BOTTOM, fill=Tkinter.BOTH, expand=True)
 
-		self.terminal1 = terminal.Terminal(self.terminalFrame, width/2, height/3, bgcolor, shutTime=shutTime)
+		self.terminal1 = terminal.Terminal(self.terminalFrame, width/2, height/3, bgcolor, self.lang, shutTime=shutTime)
 		self.terminal1.pack(fill=Tkinter.BOTH, side=Tkinter.LEFT, expand=True)
 		self.bind_all("<Tab>", self.terminal1.autoComp)
 		
-		self.terminal2 = terminal.Terminal(self.terminalFrame, width/2, height/3, bgcolor)
+		self.terminal2 = terminal.Terminal(self.terminalFrame, width/2, height/3, bgcolor, self.lang)
 		self.terminal2.pack(fill=Tkinter.BOTH, side=Tkinter.LEFT, expand=True)
 
 	def shutDownHandler(self, event=None):

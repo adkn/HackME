@@ -4,7 +4,7 @@ import tkFont
 import os
 
 class Boot(Tkinter.Label):
-	def __init__(self, mWindow, width, height, bgcolor, bootTime=5):
+	def __init__(self, mWindow, width, height, bgcolor, lang, bootTime=5):
 		Tkinter.Label.__init__(self, foreground="white", background=bgcolor, anchor=Tkinter.SW, justify=Tkinter.LEFT)
 
 		if os.name == "posix":
@@ -15,6 +15,8 @@ class Boot(Tkinter.Label):
 		ch = self.font.metrics("linespace")
 		self.th = height/ch
 		self.lw = width/cw - 2
+
+		self.lang = lang
 
 		self.height, self.width = height, width
 
@@ -60,7 +62,7 @@ class Boot(Tkinter.Label):
 		self.updateText()
 	
 	def boot(self):
-		f = open('./Content/boot.txt')
+		f = open(self.lang["boot"])
 		bootText = f.read()
 		f.close()
 

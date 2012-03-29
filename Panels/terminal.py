@@ -5,8 +5,10 @@ import tkFont
 import os
 
 class Terminal(Tkinter.Label):
-	def __init__(self, mWindow, width, height, bgcolor, shutTime=2.0):
+	def __init__(self, mWindow, width, height, bgcolor, lang, shutTime=2.0):
 		Tkinter.Label.__init__(self, master=mWindow, foreground="green", background=bgcolor, anchor=Tkinter.SW, justify=Tkinter.LEFT)
+
+		self.lang = lang
 
 		self.height, self.width = height, width
 		self.shutTime = shutTime
@@ -58,7 +60,7 @@ class Terminal(Tkinter.Label):
 		elif event.keysym == "BackSpace":
 			line = self.getLastLine(clean=False)
 			if self.state == const.states.login:
-				if line == "Login: " or line == "Password: ":
+				if line == self.lang["login"] or line == self.lang["password"]:
 					return
 			if line == ":>":
 				return
@@ -83,10 +85,10 @@ class Terminal(Tkinter.Label):
 		command = line
 		if self.state == const.states.login:
 			if self.userName == "":
-				self.userName = command[len("Login: "):]
-				self.printOut("Password: ")
+				self.userName = command[len(self.lang["login"]):]
+				self.printOut(self.lang["password"])
 			else:
-				self.passWord = command[len("Password: "):]
+				self.passWord = command[len(self.lang["password"]):]
 				self.login(self.userName, self.passWord)
 			return
 		
@@ -109,7 +111,7 @@ class Terminal(Tkinter.Label):
 					self.addCommand(line)
 					return comEntry[1][1]()
 		
-		self.printOut(command + ": not found\n")
+		self.printOut(command + ": " + self.lang["notfound"] + '\n')
 		self.addCommand(line)
 		return -1
 	
@@ -135,20 +137,20 @@ class Terminal(Tkinter.Label):
 			if params[1] in self.aliases:
 				del self.aliases[params[1]]
 				self.event_generate("<<alias>>")
-				self.printOut(params[1] + " has been deleted\n")
+				self.printOut(params[1] + " " + self.lang["deleted"] + '\n')
 				return
 		if len(params) != 3:
-			self.printOut("Invalid Syntax: alias VAR_NAME VAR_VALUE\n")
+			self.printOut(self.lang["alias_invsyn"] + '\n')
 			return
 		variable = params[1]
 		for comEntry in self.commands:
 			if comEntry[0] == variable.lower():
-				self.printOut("can't assign alias to commands \n")
+				self.printOut(self.lang["alias_cantass"] + '\n')
 				return
 		value = params[2]
 		self.aliases[variable] = value
 		self.event_generate("<<alias>>")
-		self.printOut(variable + " set to " + value + '\n')
+		self.printOut(self.lang["alias_setto"].format(variable, value))
 
 	def c_shutdown(self):
 		self.event_generate("<<shut>>")
@@ -248,7 +250,7 @@ class Terminal(Tkinter.Label):
 				self.lineL = 0
 				self.lineC += 1
 				if command.startswith(":>"):
-					self.printOut(": command not found\n:>")
+					self.printOut(": " + self.lang["notfound"] + "\n:>")
 				elif self.state == const.states.login:
 					self.doCommand(command)
 

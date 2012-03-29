@@ -3,12 +3,13 @@ import tkFont
 import os
 
 class Explorer(Tkinter.Canvas):
-	def __init__(self, mWindow, name, width, height, bgcolor):
+	def __init__(self, mWindow, name, width, height, bgcolor, lang):
 		Tkinter.Canvas.__init__(self, master=mWindow, background=bgcolor, width=width, height=height)
 
 		self.height, self.width = height, width
 		self.name = name
 		self.bgcolor = bgcolor
+		self.lang = lang
 
 		self.config(highlightcolor="white")
 		
@@ -19,15 +20,16 @@ class Explorer(Tkinter.Canvas):
 		cw = self.font.measure('A')
 		ch = self.font.metrics("linespace")
 
-		self.nameLabel = Tkinter.Label(self, text=name, fg="green", bg=bgcolor, anchor=Tkinter.NW, justify=Tkinter.LEFT)
+		self.nameLabel = Tkinter.Label(self, text=self.lang[name], fg="green", bg=bgcolor, anchor=Tkinter.NW, justify=Tkinter.LEFT)
 		self.nameLabel.config(width=self.width/cw, height=1, font=self.font, highlightthickness=0, bd=0)
 		self.nameLabel.pack(side=Tkinter.TOP, fill=Tkinter.X, padx=3, pady=3)
 
-		self.statusLabel = Tkinter.Label(self, text=name + " statusbar", fg="green", bg=bgcolor, anchor=Tkinter.SW, justify=Tkinter.LEFT)
-		self.statusLabel.config(width=self.width/cw, height=1, font=self.font, highlightthickness=0, bd=0)
+		self.statusLabel = Tkinter.Label(self, fg="green", bg=bgcolor, anchor=Tkinter.SW, justify=Tkinter.LEFT)
+		self.statusLabel.config(width=self.width/cw, text=self.lang[name] + " " + self.lang["statusbar"])
+		self.statusLabel.config(height=1, font=self.font, highlightthickness=0, bd=0)
 		self.statusLabel.pack(side=Tkinter.BOTTOM, fill=Tkinter.X, padx=3, pady=3)
 
-		if name.lower() == "aliases":
+		if name == "aliases":
 			self.initAliases()
 
 	def initAliases(self):
