@@ -18,7 +18,7 @@ class HackMEWindow(Tkinter.Tk):
 		self.bind_all("<<alias>>", self.eventHandler)
 		self.config(bg=bgcolor)
 
-		lang = "EN"
+		lang = "TR"
 		self.loadLang(lang)
 		
 		#self.width, self.height = width, height
@@ -35,6 +35,7 @@ class HackMEWindow(Tkinter.Tk):
 		langDir = "./Content/"
 		if lang in langs:
 			langDir = "./Content/" + lang
+		print langDir
 		langFile = langDir + "/templates.txt"
 		f = open(langFile)
 		langParams = f.read()
@@ -115,7 +116,7 @@ class HackMEWindow(Tkinter.Tk):
 		elif event.type == "35":
 			if self.terminal1.state == const.states.boot:
 				self.boot.destroy()
-				self.terminal1.printOut("Login: ")
+				self.terminal1.printOut(self.lang["login"])
 				self.terminal1.state = const.states.login
 			elif self.terminal1.state == const.states.hack:
 				self.explorers[2].updAlias(self.terminal1.aliases)
