@@ -1,4 +1,4 @@
-Shutting Down KadOS
+KadOS Kapatiliyor
 
 
 Checking coming traces..

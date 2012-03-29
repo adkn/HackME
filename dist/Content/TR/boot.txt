@@ -83,7 +83,7 @@ virtual bool IOHIDEventSystemUserClient::initWithTask(task*, void*, UInt32):
 Client task not privileged to open IOHIDSystem for mapping memory (e00002c1)
  
  
-Boot Complete
+Boot Tamamlandi
  
  
  
