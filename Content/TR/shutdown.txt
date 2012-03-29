@@ -1,0 +1,10 @@
+KadOS Kapatiliyor
+
+
+Checking coming traces..
+
+
+
+ No trace found [DONE]
+Logging out.... [DONE]
+System shut down, you can unplug your computer now..

@@ -1,5 +1,5 @@
 import Tkinter
-from Panels import *
+from source import *
 import os
 import threading
 
@@ -14,25 +14,30 @@ class HackMEWindow(Tkinter.Tk):
 		self.bind_all("<Key>", self.eventHandler)
 		self.bind_all("<Button>", self.eventHandler)
 		self.bind_all("<<boot>>", self.eventHandler)
+
 		self.bind_all("<<shut>>", self.shutDownHandler)
 		self.bind_all("<<alias>>", self.eventHandler)
+		self.bind_all("<<lang>>", self.langHandler)
+
 		self.config(bg=bgcolor)
 
-		lang = "TR"
+		self.options = options.Options()
+		self.opts = self.options.getOpts()
+
+		lang = self.opts["lang"]
 		self.loadLang(lang)
-		
-		#self.width, self.height = width, height
+
 		self.width, self.height = self.winfo_screenwidth(), self.winfo_screenheight()
 
 		self.bgcolor = bgcolor
 		self.initView()
 
-	def loadLang(self, lang):
+	def loadLang(self, lang, chg = False):
 		langs = []
 		for dirpath, dirnames, filenames in os.walk("./Content"):
 			for dir in dirnames:
 				langs.append(dir)
-		langDir = "./Content"
+		langDir = "./Content/EN"
 		if lang in langs:
 			langDir = "./Content/" + lang
 
@@ -45,6 +50,18 @@ class HackMEWindow(Tkinter.Tk):
 		self.lang["boot"] = langDir + "/boot.txt"
 		self.lang["shutdown"] = langDir + "/shutDown.txt"
 		self.lang["initialize"] = langDir + "/initialize.txt"
+
+		if chg:
+			print "bura"
+			for i in range(3):
+				self.explorers[i].lang = self.lang
+			self.terminal1.lang = self.lang
+			self.terminal2.lang = self.lang
+			self.boot.lang = self.lang
+			self.shut.lang = self.lang
+
+			self.terminal1.lang2 = None
+			self.terminal1.printOut(self.lang["lang_set"].format(self.lang["lang_code"]) + '\n')
 	
 	def initView(self):
 		bgcolor = self.bgcolor
@@ -75,11 +92,11 @@ class HackMEWindow(Tkinter.Tk):
 		self.terminalFrame = Tkinter.Frame(self)
 		self.terminalFrame.pack(side=Tkinter.BOTTOM, fill=Tkinter.BOTH, expand=True)
 
-		self.terminal1 = terminal.Terminal(self.terminalFrame, width/2, height/3, bgcolor, self.lang, shutTime=shutTime)
+		self.terminal1 = terminal.Terminal(self.terminalFrame, width/2, height/3, bgcolor, self.lang, self.options, self.opts["tcol"], shutTime=shutTime)
 		self.terminal1.pack(fill=Tkinter.BOTH, side=Tkinter.LEFT, expand=True)
 		self.bind_all("<Tab>", self.terminal1.autoComp)
 		
-		self.terminal2 = terminal.Terminal(self.terminalFrame, width/2, height/3, bgcolor, self.lang)
+		self.terminal2 = terminal.Terminal(self.terminalFrame, width/2, height/3, bgcolor, self.lang, self.options, self.opts["tcol"])
 		self.terminal2.pack(fill=Tkinter.BOTH, side=Tkinter.LEFT, expand=True)
 
 	def shutDownHandler(self, event=None):
@@ -107,7 +124,10 @@ class HackMEWindow(Tkinter.Tk):
 			self.quit()
 		elif self.shut.state == const.states.restart:
 			self.shut.destroy()
-			self.initView()		
+			self.initView()
+	
+	def langHandler(self, event=None):
+		self.loadLang(self.terminal1.lang2, chg=True)
 
 	def eventHandler(self, event=None):
 		if event.type == "2":

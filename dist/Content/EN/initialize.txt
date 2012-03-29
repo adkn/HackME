@@ -1,0 +1,33 @@
+Intializing.....
+
+
+
+[DONE]
+Loading KadOS Packages.......
+
+
+
+
+
+
+
+
+
+
+
+[DONE]
+Loading KadOS Development Tools......
+
+
+
+
+
+[DONE]
+Loading KadOS High-Privileges.....
+
+
+
+
+
+[FAIL]
+DONE! Welcome, .

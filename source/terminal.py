@@ -5,10 +5,12 @@ import tkFont
 import os
 
 class Terminal(Tkinter.Label):
-	def __init__(self, mWindow, width, height, bgcolor, lang, shutTime=2.0):
-		Tkinter.Label.__init__(self, master=mWindow, foreground="green", background=bgcolor, anchor=Tkinter.SW, justify=Tkinter.LEFT)
+	def __init__(self, mWindow, width, height, bgcolor, lang, opts, fgcolor, shutTime=2.0):
+		Tkinter.Label.__init__(self, master=mWindow, foreground=fgcolor, background=bgcolor, anchor=Tkinter.SW, justify=Tkinter.LEFT)
 
 		self.lang = lang
+		self.lang2 = None
+		self.options = opts
 
 		self.height, self.width = height, width
 		self.shutTime = shutTime
@@ -37,13 +39,15 @@ class Terminal(Tkinter.Label):
 		self.aliases = {}
 
 		self.commands =	[
-			['help', ['shows that menu', self.c_help]],
-			['shutdown', ['shutdowns computer', self.c_shutdown]],
-			['restart', ['restarts computer', self.c_restart]],
-			['clear', ['clears terminal', self.c_clear]],
-			['alias', ['declares a variable', self.c_alias]],
-			['version', ['shows version info', self.c_version]],
-			['whoami', ['shows user information', self.c_whoami]]
+			["help", [self.lang["c_help"], self.c_help]],
+			["shutdown", [self.lang["c_shutdown"], self.c_shutdown]],
+			["restart", [self.lang["c_restart"], self.c_restart]],
+			["clear", [self.lang["c_clear"], self.c_clear]],
+			["alias", [self.lang["c_alias"], self.c_alias]],
+			["version", [self.lang["c_version"], self.c_version]],
+			["whoami", [self.lang["c_whoami"], self.c_whoami]],
+			["color", [self.lang["c_color"], self.c_color]],
+			["lang", [self.lang["c_lang"], self.c_lang]],
 		]
 
 	def keyPressed(self, event):
@@ -124,6 +128,27 @@ class Terminal(Tkinter.Label):
 	
 	def c_version(self):
 		self.printOut("KadOS v2.3\n")
+
+	def c_color(self):
+		params = self.line.split(' ')
+		if len(params) == 1:
+			self.printOut(self.options.getOpts()["tcol"] + '\n')
+		elif len(params) == 2:
+			self.options.setOpts(tcol = params[1])
+			self.textColor(params[1])
+		else:
+			self.printOut(self.lang["color_invsyn"] + '\n')
+	
+	def c_lang(self):
+		params = self.line.split(' ')
+		if len(params) == 1:
+			self.printOut(self.lang["lang_code"] + '\n')
+		elif len(params) == 2:
+			self.options.setOpts(lang = params[1])
+			self.lang2 = params[1]
+			self.event_generate("<<lang>>")
+		else:
+			self.printOut(self.lang["lang_invsyn"] + '\n')
 		
 	def c_whoami(self):
 		self.printOut(self.userName + '\n')
@@ -150,7 +175,7 @@ class Terminal(Tkinter.Label):
 		value = params[2]
 		self.aliases[variable] = value
 		self.event_generate("<<alias>>")
-		self.printOut(self.lang["alias_setto"].format(variable, value))
+		self.printOut(self.lang["alias_setto"].format(variable, value) + '\n')
 
 	def c_shutdown(self):
 		self.event_generate("<<shut>>")
@@ -279,8 +304,22 @@ class Terminal(Tkinter.Label):
 		self.state = const.states.hack
 
 		self.printOut(":>")
+
+	def textColor(self, color):
+		self.config(foreground=color)
 		
 	def login(self, userName, passWord):
-		self.state = const.states.init
-		threading.Thread(target=self.initialize).start()
+		if self.options.checkSession(userName, passWord):
+			self.state = const.states.init
+			self.printOut(self.lang["login_suc"] + "\n")
+			opts = self.options.getOpts()
+			self.textColor(opts["tcol"])
+			self.lang2 = opts["lang"]
+			self.event_generate("<<lang>>")
+			threading.Thread(target=self.initialize).start()
+		else:
+			self.printOut(self.lang["login_inv"] + "\n")
+			self.userName = ""
+			self.passWord = ""
+			self.printOut(self.lang["login"])
 	

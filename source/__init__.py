@@ -18,3 +18,4 @@ import const
 import explorer
 import shutdown
 import terminal
+import options
