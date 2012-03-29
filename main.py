@@ -29,13 +29,13 @@ class HackMEWindow(Tkinter.Tk):
 
 	def loadLang(self, lang):
 		langs = []
-		for dirpath, dirnames, filenames in os.walk("./Content/"):
+		for dirpath, dirnames, filenames in os.walk("./Content"):
 			for dir in dirnames:
 				langs.append(dir)
-		langDir = "./Content/"
+		langDir = "./Content"
 		if lang in langs:
 			langDir = "./Content/" + lang
-		print langDir
+
 		langFile = langDir + "/templates.txt"
 		f = open(langFile)
 		langParams = f.read()
@@ -51,7 +51,7 @@ class HackMEWindow(Tkinter.Tk):
 		width, height = self.width, self.height
 		if os.name == "nt":
 			self.wm_attributes("-fullscreen", 1)
-		#self.geometry(str(self.width)+"x"+str(self.height)+"+0+0")
+
 		self.focus_set()
 
 		bootTime = 3.0

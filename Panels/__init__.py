@@ -10,5 +10,11 @@ for root, dirs, files in os.walk(os.path.curdir + '/Panels'):
 			fileName = file[:file.find('.py')]
 			panels.append(fileName)
 
-for file in panels:
-	exec ("import " + file)
+#for file in panels:
+#	exec ("import " + file)
+
+import boot
+import const
+import explorer
+import shutdown
+import terminal
