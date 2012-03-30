@@ -11,7 +11,7 @@
 	"deleted": "silindi",
 	"alias_invsyn": "Hatali syntax: alias VAR_NAME VAR_VALUE",
 	"alias_cantass": "Komutlara alias atanamaz",
-	"alias_setto": "{0}, {1} olarak ayarlandi\n",
+	"alias_setto": "{0}, {1} olarak ayarlandi",
 	"login_suc": "Giris basarili",
 	"login_inv": "Hatali kullanici/sifre",
 	"color_invsyn": "Hatali syntax: color COLOR_NAME",

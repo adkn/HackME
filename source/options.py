@@ -2,7 +2,7 @@ import sqlite3
 import hashlib
 
 class Options:
-	def __init__(self, dbName = "hackme.db", defOpt = "{\"lang\": \"EN\", \"tcol\": \"white\"}"):
+	def __init__(self, dbName = "hackme.db", defOpt = "{\"lang\": \"EN\", \"tcol\": \"white\", \"aliases\": {}, \"hdd\": []}"):
 		self.dbName = dbName
 		self.conn = sqlite3.connect(dbName)
 		self.defOpt = eval(defOpt)

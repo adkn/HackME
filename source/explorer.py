@@ -33,6 +33,8 @@ class Explorer(Tkinter.Canvas):
 			self.initAliases()
 
 	def initAliases(self):
+		self.width = self.width / 3
+		self.config(width = self.width)
 		cw = self.font.measure('A')
 		ch = self.font.metrics("linespace")
 		self.aliasBar = Tkinter.Scrollbar(self)

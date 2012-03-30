@@ -105,7 +105,6 @@ class Terminal(Tkinter.Label):
 				self.userName = command[len(self.lang["login"]):]
 				self.printOut(self.lang["password"])
 			else:
-				#self.passWord = command[len(self.lang["password"]):]
 				self.login(self.userName, self.passWord)
 			return
 		
@@ -190,6 +189,7 @@ class Terminal(Tkinter.Label):
 				return
 		value = params[2]
 		self.aliases[variable] = value
+		self.options.setOpts(aliases = self.aliases)
 		self.event_generate("<<alias>>")
 		self.printOut(self.lang["alias_setto"].format(variable, value) + '\n')
 
@@ -318,6 +318,7 @@ class Terminal(Tkinter.Label):
 			threading._sleep(timepl)
 		self.printOut('\b' + self.userName + '\n')
 		self.state = const.states.hack
+		self.event_generate("<<alias>>")
 
 		self.printOut(":>")
 
@@ -332,6 +333,7 @@ class Terminal(Tkinter.Label):
 			self.textColor(opts["tcol"])
 			self.lang2 = opts["lang"]
 			self.state = const.states.init
+			self.aliases = self.options.getOpts()["aliases"]
 			self.event_generate("<<lang>>")
 			threading.Thread(target=self.initialize).start()
 		else:
