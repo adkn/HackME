@@ -1,3 +1,4 @@
+#!/usr/bin/python
 import Tkinter
 from source import *
 import os
@@ -48,11 +49,10 @@ class HackMEWindow(Tkinter.Tk):
 
 		exec("self.lang = " + langParams)
 		self.lang["boot"] = langDir + "/boot.txt"
-		self.lang["shutdown"] = langDir + "/shutDown.txt"
+		self.lang["shutdown"] = langDir + "/shutdown.txt"
 		self.lang["initialize"] = langDir + "/initialize.txt"
 
 		if chg:
-			print "bura"
 			for i in range(3):
 				self.explorers[i].lang = self.lang
 			self.terminal1.lang = self.lang
@@ -61,6 +61,7 @@ class HackMEWindow(Tkinter.Tk):
 			self.shut.lang = self.lang
 
 			self.terminal1.lang2 = None
+			self.terminal1.loadCommands()
 			self.terminal1.printOut(self.lang["lang_set"].format(self.lang["lang_code"]) + '\n')
 	
 	def initView(self):

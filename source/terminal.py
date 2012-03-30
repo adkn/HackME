@@ -38,6 +38,9 @@ class Terminal(Tkinter.Label):
 		self.sendCommands = []
 		self.aliases = {}
 
+		self.loadCommands()
+
+	def loadCommands(self):
 		self.commands =	[
 			["help", [self.lang["c_help"], self.c_help]],
 			["shutdown", [self.lang["c_shutdown"], self.c_shutdown]],
@@ -49,6 +52,7 @@ class Terminal(Tkinter.Label):
 			["color", [self.lang["c_color"], self.c_color]],
 			["lang", [self.lang["c_lang"], self.c_lang]],
 		]
+	
 
 	def keyPressed(self, event):
 		if self.state == const.states.boot or self.state == const.states.init:
@@ -286,7 +290,7 @@ class Terminal(Tkinter.Label):
 		self.updateText()
 		
 	def initialize(self):
-		f = open('./Content/initialize.txt')
+		f = open(self.lang["initialize"])
 		initText = f.read()
 		f.close()
 
