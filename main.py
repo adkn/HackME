@@ -41,7 +41,8 @@ class HackMEWindow(Tkinter.Tk):
 		langDir = "./Content/EN"
 		if lang in langs:
 			langDir = "./Content/" + lang
-
+		else:
+			self.terminal1.printOut(self.lang["lang_notfnd"].format(lang))
 		langFile = langDir + "/templates.txt"
 		f = open(langFile)
 		langParams = f.read()
@@ -54,7 +55,7 @@ class HackMEWindow(Tkinter.Tk):
 
 		if chg:
 			for i in range(3):
-				self.explorers[i].lang = self.lang
+				self.explorers[i].loadLang(self.lang)
 			self.terminal1.lang = self.lang
 			self.terminal2.lang = self.lang
 			self.boot.lang = self.lang
@@ -62,6 +63,8 @@ class HackMEWindow(Tkinter.Tk):
 
 			self.terminal1.lang2 = None
 			self.terminal1.loadCommands()
+			
+		if "terminal1" in self.__dict__:
 			self.terminal1.printOut(self.lang["lang_set"].format(self.lang["lang_code"]) + '\n')
 	
 	def initView(self):
@@ -73,6 +76,7 @@ class HackMEWindow(Tkinter.Tk):
 		self.focus_set()
 
 		bootTime = 3.0
+		initTime = 2.0
 		shutTime = 1.0
 
 		self.boot = boot.Boot(self, width, height, bgcolor, self.lang, bootTime=bootTime)
@@ -81,7 +85,6 @@ class HackMEWindow(Tkinter.Tk):
 		self.shut = shutdown.Shutdown(self, width, height, bgcolor, self.lang, shutTime=shutTime)
 		
 		self.explorerFrame = Tkinter.Frame(self, width=width, height=height/3*2)
-		self.explorerFrame.pack(fill=Tkinter.BOTH, side=Tkinter.TOP, expand=True)
 
 		explorerNames = ["fileexplorer", "texteditor", "aliases"]
 		self.explorers = []
@@ -93,7 +96,7 @@ class HackMEWindow(Tkinter.Tk):
 		self.terminalFrame = Tkinter.Frame(self)
 		self.terminalFrame.pack(side=Tkinter.BOTTOM, fill=Tkinter.BOTH, expand=True)
 
-		self.terminal1 = terminal.Terminal(self.terminalFrame, width/2, height/3, bgcolor, self.lang, self.options, self.opts["tcol"], shutTime=shutTime)
+		self.terminal1 = terminal.Terminal(self.terminalFrame, width/2, height/3, bgcolor, self.lang, self.options, self.opts["tcol"], initTime=initTime)
 		self.terminal1.pack(fill=Tkinter.BOTH, side=Tkinter.LEFT, expand=True)
 		self.bind_all("<Tab>", self.terminal1.autoComp)
 		
@@ -139,6 +142,9 @@ class HackMEWindow(Tkinter.Tk):
 				self.boot.destroy()
 				self.terminal1.printOut(self.lang["login"])
 				self.terminal1.state = const.states.login
+			elif self.terminal1.state == const.states.login:
+				self.terminal1.state = const.states.login
+				self.explorerFrame.pack(fill=Tkinter.BOTH, side=Tkinter.TOP, expand=True)
 			elif self.terminal1.state == const.states.hack:
 				self.explorers[2].updAlias(self.terminal1.aliases)
 		
@@ -153,3 +159,4 @@ def main():
 if __name__ == "__main__":
 	if os.name == "nt" or os.name == "posix":
 		main()
+

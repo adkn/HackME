@@ -77,8 +77,12 @@ class Options:
 		sql = "INSERT INTO users (userName, passWord) VALUES (?, ?)"
 		c.execute(sql, (userName, self.md5(passWord)))
 
+		sql = "SELECT _id FROM users WHERE userName = ? AND passWord = ?"
+		c.execute(sql, (userName, self.md5(passWord)))
+		
+		self.uID = c.fetchone()[0]
+
 		sql = "INSERT INTO options (uID, opt) VALUES (?, ?)"
-		self.uID = c.lastrowid
 		c.execute(sql, (self.uID, str(self.defOpt)))
 
 		c.close()
@@ -96,3 +100,4 @@ class Options:
 
 		c.close()
 		self.conn.commit()
+

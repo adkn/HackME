@@ -5,7 +5,7 @@ import tkFont
 import os
 
 class Terminal(Tkinter.Label):
-	def __init__(self, mWindow, width, height, bgcolor, lang, opts, fgcolor, shutTime=2.0):
+	def __init__(self, mWindow, width, height, bgcolor, lang, opts, fgcolor, initTime=2.0):
 		Tkinter.Label.__init__(self, master=mWindow, foreground=fgcolor, background=bgcolor, anchor=Tkinter.SW, justify=Tkinter.LEFT)
 
 		self.lang = lang
@@ -13,7 +13,7 @@ class Terminal(Tkinter.Label):
 		self.options = opts
 
 		self.height, self.width = height, width
-		self.shutTime = shutTime
+		self.initTime = initTime
 		self.userName = ""
 		self.passWord = ""
 		
@@ -21,6 +21,7 @@ class Terminal(Tkinter.Label):
 			self.font = tkFont.Font(family="Monospace", size=10, weight="normal")
 		elif os.name == "nt":
 			self.font = tkFont.Font(family="courier", size=8, weight="normal")
+			
 		cw = self.font.measure('A')
 		ch = self.font.metrics("linespace")
 		self.th = height/ch
@@ -61,8 +62,6 @@ class Terminal(Tkinter.Label):
 			command = self.getLastLine()
 			self.printOut('\n')
 			self.doCommand(command)
-			if not self.winfo_exists():
-				return
 			if self.state == const.states.hack:
 				self.printOut(":>")
 		elif event.keysym == "BackSpace":
@@ -70,6 +69,8 @@ class Terminal(Tkinter.Label):
 			if self.state == const.states.login:
 				if line == self.lang["login"] or line == self.lang["password"]:
 					return
+				if line.startswith(self.lang["password"]):
+					self.passWord = self.passWord[:-1]
 			if line == ":>":
 				return
 			self.printOut('\b')
@@ -81,12 +82,20 @@ class Terminal(Tkinter.Label):
 			self.getNextCommand()
 		else:
 			if len(event.char) == 1:
+				if self.state == const.states.login:
+					line = self.getLastLine(clean=False)
+					if line.startswith(self.lang["password"]):
+						self.printOut('*')
+						self.passWord += event.char
+						return
 				self.printOut(event.char)
 
 		#for key in event.__dict__:
 		#	print key, ':', event.__dict__[key]
 
 	def updateText(self):
+		if not self.winfo_exists():
+			return
 		self.config(text=self.text + '_')
 
 	def doCommand(self, line, printout=True):
@@ -96,18 +105,18 @@ class Terminal(Tkinter.Label):
 				self.userName = command[len(self.lang["login"]):]
 				self.printOut(self.lang["password"])
 			else:
-				self.passWord = command[len(self.lang["password"]):]
+				#self.passWord = command[len(self.lang["password"]):]
 				self.login(self.userName, self.passWord)
 			return
 		
-		cSplit = line.lower().split(' ', 1)
+		cSplit = line.split(' ', 1)
 		command = cSplit[0]
 		self.line = line
 		if command in self.aliases:
 			value = self.aliases[command]
 			self.addCommand(line)
 			for comEntry in self.commands:
-				if value.lower() == comEntry[0]:
+				if value == comEntry[0]:
 					comEntry[1][1]()
 					command = ""
 			if command != "" and printout:
@@ -138,8 +147,11 @@ class Terminal(Tkinter.Label):
 		if len(params) == 1:
 			self.printOut(self.options.getOpts()["tcol"] + '\n')
 		elif len(params) == 2:
-			self.options.setOpts(tcol = params[1])
-			self.textColor(params[1])
+			try:
+				self.textColor(params[1])
+				self.options.setOpts(tcol = params[1])
+			except:
+				self.printOut(self.lang["color_notfnd"].format(params[1]) + '\n')
 		else:
 			self.printOut(self.lang["color_invsyn"] + '\n')
 	
@@ -173,7 +185,7 @@ class Terminal(Tkinter.Label):
 			return
 		variable = params[1]
 		for comEntry in self.commands:
-			if comEntry[0] == variable.lower():
+			if comEntry[0] == variable:
 				self.printOut(self.lang["alias_cantass"] + '\n')
 				return
 		value = params[2]
@@ -225,11 +237,11 @@ class Terminal(Tkinter.Label):
 			else:
 				possibilities = []
 				for comEntry in self.commands:
-					if comEntry[0].startswith(line.lower()):
+					if comEntry[0].startswith(line):
 						possibilities.append(comEntry[0])
 						
 				for key in self.aliases:
-					if key.startswith(line.lower()):
+					if key.startswith(line):
 						possibilities.append(key)
 						
 				if len(possibilities) == 0:
@@ -294,7 +306,7 @@ class Terminal(Tkinter.Label):
 		initText = f.read()
 		f.close()
 
-		initTime = 2.0 #secs
+		initTime = self.initTime
 		timepl = initTime/len(initText.split('\n'))
 
 		for c in initText.split('\n'):
@@ -314,11 +326,12 @@ class Terminal(Tkinter.Label):
 		
 	def login(self, userName, passWord):
 		if self.options.checkSession(userName, passWord):
-			self.state = const.states.init
+			self.event_generate("<<alias>>")
 			self.printOut(self.lang["login_suc"] + "\n")
 			opts = self.options.getOpts()
 			self.textColor(opts["tcol"])
 			self.lang2 = opts["lang"]
+			self.state = const.states.init
 			self.event_generate("<<lang>>")
 			threading.Thread(target=self.initialize).start()
 		else:

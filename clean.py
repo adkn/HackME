@@ -25,3 +25,5 @@ def walk_python_files(paths, is_python=has_python_ext, exclude_dirs=None):
 
 for fullpath in walk_python_files(['.'], exclude_dirs=["build", "dist", ".git"]):
 	os.remove(fullpath)
+
+os.remove("./hackme.db")

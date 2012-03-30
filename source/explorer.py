@@ -25,7 +25,7 @@ class Explorer(Tkinter.Canvas):
 		self.nameLabel.pack(side=Tkinter.TOP, fill=Tkinter.X, padx=3, pady=3)
 
 		self.statusLabel = Tkinter.Label(self, fg="green", bg=bgcolor, anchor=Tkinter.SW, justify=Tkinter.LEFT)
-		self.statusLabel.config(width=self.width/cw, text=self.lang[name] + " " + self.lang["statusbar"])
+		self.statusLabel.config(width=self.width/cw, text=self.lang[self.name + "_statusbar"])
 		self.statusLabel.config(height=1, font=self.font, highlightthickness=0, bd=0)
 		self.statusLabel.pack(side=Tkinter.BOTTOM, fill=Tkinter.X, padx=3, pady=3)
 
@@ -45,7 +45,13 @@ class Explorer(Tkinter.Canvas):
 
 		self.aliasBar.config(command=(self.aliasBox, 'yview'))
 
+	def loadLang(self, lang):
+		self.lang = lang
+		self.nameLabel.config(text=self.lang[self.name])
+		self.statusLabel.config(text=self.lang[self.name + "_statusbar"])
+
 	def updAlias(self, aliases):
 		self.aliasBox.delete(0, Tkinter.END)
 		for var in aliases:
 			self.aliasBox.insert(Tkinter.END, var + ": " + aliases[var])
+
