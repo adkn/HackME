@@ -1,6 +1,7 @@
 import Tkinter
 import tkFont
 import os
+import filesystem
 
 class Explorer(Tkinter.Canvas):
 	def __init__(self, mWindow, name, width, height, bgcolor, lang):
@@ -31,6 +32,8 @@ class Explorer(Tkinter.Canvas):
 
 		if name == "aliases":
 			self.initAliases()
+		elif name == "fileexplorer":
+			self.initFiles()
 
 	def initAliases(self):
 		self.width = self.width / 3
@@ -56,4 +59,24 @@ class Explorer(Tkinter.Canvas):
 		self.aliasBox.delete(0, Tkinter.END)
 		for var in aliases:
 			self.aliasBox.insert(Tkinter.END, var + ": " + aliases[var])
+	
+	def initFiles(self):
+		cw = self.font.measure('A')
+		ch = self.font.metrics("linespace")
 
+		self.fileBar = Tkinter.Scrollbar(self)
+		self.fileBar.pack(side=Tkinter.RIGHT, fill=Tkinter.Y, pady=10, padx=2)
+
+		self.fileBox = Tkinter.Listbox(self, background=self.bgcolor, foreground="green", width=self.width/cw, height=self.height/ch - 9)
+		self.fileBox.config(bd=0, relief=Tkinter.FLAT, font=self.font, yscrollcommand=(self.fileBar, 'set'))
+		self.fileBox.config(selectforeground="green", selectbackground=self.bgcolor, activestyle="none", highlightthickness=0)
+		self.fileBox.pack(pady=8, padx=2, side=Tkinter.RIGHT, fill=Tkinter.X, expand=True, anchor=Tkinter.NW)
+
+		self.fileBar.config(command=(self.fileBox, 'yview'))
+
+	def loadHDD(self, hdd):
+		self.fileSys = hdd
+
+		self.fileBox.delete(0, Tkinter.END)
+		for file in self.fileSys.getFiles():
+			self.fileBox.insert(Tkinter.END, file)

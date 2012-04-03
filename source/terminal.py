@@ -52,6 +52,8 @@ class Terminal(Tkinter.Label):
 			["whoami", [self.lang["c_whoami"], self.c_whoami]],
 			["color", [self.lang["c_color"], self.c_color]],
 			["lang", [self.lang["c_lang"], self.c_lang]],
+			["mkdir", [self.lang["c_mkdir"], self.c_mkdir]],
+			["cd", [self.lang["c_cd"], self.c_cd]],
 		]
 	
 
@@ -140,6 +142,26 @@ class Terminal(Tkinter.Label):
 	
 	def c_version(self):
 		self.printOut("KadOS v2.3\n")
+	
+	def c_mkdir(self):
+		params = self.line.split(' ')
+		if len(params) == 2:
+			self.files.makeDir(params[1])
+			self.event_generate("<<files>>")
+		else:
+			self.printOut(self.lang["mkdir_invsyn"])
+	
+	def c_cd(self):
+		params = self.line.split(' ')
+		if len(params) == 2:
+			dir = params[1]
+			if not self.files.changeDir(dir):
+				self.printOut(self.lang["cd_nodir"] + '\n')
+			else:
+				self.event_generate("<<files>>")
+		else:
+			self.printOut(self.lang["cd_invsyn"] + '\n')
+		print self.files.curLoc
 
 	def c_color(self):
 		params = self.line.split(' ')
@@ -317,6 +339,8 @@ class Terminal(Tkinter.Label):
 					self.printOut(c)
 			threading._sleep(timepl)
 		self.printOut('\b' + self.userName + '\n')
+		
+		self.event_generate("<<files>>")
 		self.state = const.states.hack
 		self.event_generate("<<alias>>")
 
@@ -341,4 +365,6 @@ class Terminal(Tkinter.Label):
 			self.userName = ""
 			self.passWord = ""
 			self.printOut(self.lang["login"])
-	
+
+	def getParams(self):
+		params = self.line.split(' ')

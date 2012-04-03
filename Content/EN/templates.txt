@@ -28,6 +28,11 @@
 	"c_whoami": "Shows user information",
 	"c_color": "Sets terminal color",
 	"c_lang": "Sets language of KadOS",
+	"c_mkdir": "Creates Directory",
+	"c_cd": "Changes Current Directory",
+	"mkdir_invsyn": "Invalid Syntax: mkdir DIR_NAME",
+	"cd_invsyn": "Invalid Syntax: cd DIR_NAME",
+	"cd_nodir": "This directory doesn't exists",
 	"color_notfnd" : "{0} is unknown",
 }
 

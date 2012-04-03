@@ -19,6 +19,7 @@ class HackMEWindow(Tkinter.Tk):
 		self.bind_all("<<shut>>", self.shutDownHandler)
 		self.bind_all("<<alias>>", self.eventHandler)
 		self.bind_all("<<lang>>", self.langHandler)
+		self.bind_all("<<files>>", self.fileHandler)
 
 		self.config(bg=bgcolor)
 
@@ -132,6 +133,20 @@ class HackMEWindow(Tkinter.Tk):
 	
 	def langHandler(self, event=None):
 		self.loadLang(self.terminal1.lang2, chg=True)
+	
+	def fileHandler(self, event=None):
+		opti = options.Options()
+		opti.uID = self.options.uID
+		if "files" in self.terminal1.__dict__:
+			self.files = self.terminal1.files
+			opti.setOpts(hdd = self.files.hdd)
+		else:
+			self.opts = opti.getOpts()
+			self.files = filesystem.FileSystem(self.opts["hdd"])
+			self.terminal1.files = self.files
+		
+		del opti
+		self.explorers[0].loadHDD(self.files)
 
 	def eventHandler(self, event=None):
 		if event.type == "2":
@@ -143,7 +158,7 @@ class HackMEWindow(Tkinter.Tk):
 				self.terminal1.printOut(self.lang["login"])
 				self.terminal1.state = const.states.login
 			elif self.terminal1.state == const.states.login:
-				self.terminal1.state = const.states.login
+				self.terminal1.state = const.states.init
 				self.explorerFrame.pack(fill=Tkinter.BOTH, side=Tkinter.TOP, expand=True)
 			elif self.terminal1.state == const.states.hack:
 				self.explorers[2].updAlias(self.terminal1.aliases)
